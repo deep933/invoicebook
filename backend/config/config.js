@@ -1,24 +1,29 @@
-const dotenv = require('dotenv');
-const path = require('path')
-const Joi = require('joi');
+const dotenv = require("dotenv");
+const path = require("path");
+const Joi = require("joi");
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const envVarSchema = Joi.object().keys({
-    NODE_ENV: Joi.string().valid('production','development','test').required(),
-    PORT:Joi.number().default(3000),
-    MONGO_URL:Joi.string().required().description('Mongo DB Url'),
-    JWT_SECRET:Joi.string().required().description('JWT Sceret')
-})
+  NODE_ENV: Joi.string().valid("production", "development", "test").required(),
+  PORT: Joi.number().default(3000),
+  MONGO_URL: Joi.string().required().description("Mongo DB Url"),
+  JWT_ACCESS_SECRET: Joi.string().required().description("JWT Access Sceret"),
+  JWT_REFRESH_SECRET: Joi.string().required().description("JWT Refresh Sceret"),
+});
 
-const { value: envVars, error } = envVarSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
+const { value: envVars, error } = envVarSchema
+  .prefs({ errors: { label: "key" } })
+  .validate(process.env);
 
 module.exports = {
-env:envVars.NODE_ENV,
-port:envVars.PORT,
-mongoUrl:envVars.MONGO_URL,
-jwt:{
-    ExpirationMinutes:30,
-    Secret:envVars.JWT_SECRET
-}
-}
+  env: envVars.NODE_ENV,
+  port: envVars.PORT,
+  mongoUrl: envVars.MONGO_URL,
+  jwt: {
+    accessExpirationMinutes: 2,
+    refreshExpirationDays: 30,
+    accessSecret: envVars.JWT_ACCESS_SECRET,
+    refereshSecret: envVars.JWT_REFRESH_SECRET,
+  },
+};

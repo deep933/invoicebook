@@ -27,8 +27,7 @@ const userSchema = mongoose.Schema({
 
 userSchema.statics.isUserExist = async (email) =>{
     const user = await User.findOne({ email });
-    console.log(!!user)
-  return !!user;
+    return !!user;
 }
 
 const User = mongoose.model('User',userSchema);

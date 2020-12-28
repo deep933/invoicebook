@@ -4,13 +4,18 @@ const userRoute = require('./users/user.route');
 const auth = require('./util/auth.validator')
 const mongoose = require('mongoose');
 const config = require('./config/config')
+const cookieParser = require('cookie-parser');
+const tokenController = require('./token/token.controller');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 
 mongoose.connect(config.mongoUrl,{ useUnifiedTopology: true ,useNewUrlParser:true})
 
 app.use('/user',userRoute)
+app.post('/refresh',tokenController.refreshToken)
 
 
 let server;

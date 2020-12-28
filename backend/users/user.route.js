@@ -7,10 +7,8 @@ const userController = require('./user.controller')
 
 router.post('/new', userController.createUser)
 
+router.get('/', userController.getUser)
 
-router.get('/:id', (req, res) => {
-    res.send("sdknsndsknds");
-})
 
 
 module.exports = router
