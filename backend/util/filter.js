@@ -1,4 +1,4 @@
-const filterUser = async user => {
+const filterUser = async (user) => {
   user.pass = undefined;
   user.__v = undefined;
   user.createdAt = undefined;
@@ -8,5 +8,5 @@ const filterUser = async user => {
 };
 
 module.exports = {
-  filterUser
+  filterUser,
 };

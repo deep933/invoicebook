@@ -8,7 +8,7 @@ const generateToken = async (user, expires, secret, type) => {
     user: user._id,
     exp: expires.unix(),
     iat: moment().unix(),
-    type: type,
+    type: type
   };
 
   return await jwt.sign(payload, secret);
@@ -20,33 +20,33 @@ const saveToken = async (token, user, expires, type, blacklisted = false) => {
     userId: user._id,
     expires: expires.toDate(),
     type,
-    blacklisted,
+    blacklisted
   });
 };
 
-const verifyToken = async (token, type,cb) => {
+const verifyToken = async (token, type, cb) => {
   if (type === "ACCESS") {
     try {
       return await jwt.verify(token, config.jwt.accessSecret);
     } catch (err) {
-      cb(err)
+      cb(err);
     }
   }
 
   if (type === "REFRESH") {
     try {
-    return await Token.findOne({token:token})
+      return await Token.findOne({ token: token });
     } catch (err) {
-      cb(err)
+      cb(err);
     }
   }
-}
+};
 
-const generateAuthTokens = async (user) => {
+const generateAuthTokens = async user => {
   const accessTokenExpires = moment().add(
     config.jwt.accessExpirationMinutes,
     "minutes"
-  )
+  );
 
   const accessToken = await generateToken(
     user,
@@ -72,40 +72,39 @@ const generateAuthTokens = async (user) => {
   return {
     access: {
       token: accessToken,
-      exp: accessTokenExpires.toDate(),
+      exp: accessTokenExpires.toDate()
     },
     refresh: {
       token: refreshToken,
-      exp: refreshTokenExpires.toDate(),
-    },
+      exp: refreshTokenExpires.toDate()
+    }
   };
 };
 
-const generateRefreshToken = async (user,refreshToken) =>{
-    const accessTokenExpires = moment().add(
-        config.jwt.accessExpirationMinutes,
-        "minutes"
-      )
-    
-      const accessToken = await generateToken(
-        user,
-        accessTokenExpires,
-        config.jwt.accessSecret,
-        "ACCESS"
-      );
+const generateRefreshToken = async (user, refreshToken) => {
+  const accessTokenExpires = moment().add(
+    config.jwt.accessExpirationMinutes,
+    "minutes"
+  );
 
-      return {
-        access: {
-          token: accessToken,
-          exp: accessTokenExpires.toDate(),
-        },
-        refresh: {
-          token: refreshToken.token,
-          exp: refreshToken.expires,
-        },
-      };
+  const accessToken = await generateToken(
+    user,
+    accessTokenExpires,
+    config.jwt.accessSecret,
+    "ACCESS"
+  );
 
-}
+  return {
+    access: {
+      token: accessToken,
+      exp: accessTokenExpires.toDate()
+    },
+    refresh: {
+      token: refreshToken.token,
+      exp: refreshToken.expires
+    }
+  };
+};
 
 module.exports = {
   generateAuthTokens,

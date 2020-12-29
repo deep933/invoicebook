@@ -1,30 +1,15 @@
 const User = require("./user.model");
 const tokenService = require("../token/token.service");
-const { use } = require("./user.route");
 const httperrors = require("../util/httperrors");
-
-const createUser = async (userBody, errCb) => {
-  if (await User.isUserExist(userBody.email)) {
-    errCb(httperrors.STATUS_409.status, {
-      ...httperrors.STATUS_409,
-      error: "Email already taken",
-    });
-  }
-  const user = await User.create(userBody);
-  if (!user) {
-    errCb(httperrors.STATUS_500.status, httperrors.STATUS_500);
-  }
-  return await tokenService.generateAuthTokens(user);
-};
 
 const getUser = async (tokens, errCb) => {
   const payload = await tokenService.verifyToken(
     tokens.access.token,
     "ACCESS",
-    (err) => {
+    err => {
       errCb(httperrors.STATUS_401.status, {
         ...httperrors.STATUS_401,
-        error: err,
+        error: err
       });
     }
   );
@@ -34,7 +19,7 @@ const getUser = async (tokens, errCb) => {
       if (!user) {
         errCb(httperrors.STATUS_404.status, {
           ...httperrors.STATUS_404,
-          error: "User not found",
+          error: "User not found"
         });
       }
       return user;
@@ -45,6 +30,5 @@ const getUser = async (tokens, errCb) => {
 };
 
 module.exports = {
-  createUser,
-  getUser,
+  getUser
 };

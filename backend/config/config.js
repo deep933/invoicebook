@@ -5,11 +5,19 @@ const Joi = require("joi");
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const envVarSchema = Joi.object().keys({
-  NODE_ENV: Joi.string().valid("production", "development", "test").required(),
+  NODE_ENV: Joi.string()
+    .valid("production", "development", "test")
+    .required(),
   PORT: Joi.number().default(3000),
-  MONGO_URL: Joi.string().required().description("Mongo DB Url"),
-  JWT_ACCESS_SECRET: Joi.string().required().description("JWT Access Sceret"),
-  JWT_REFRESH_SECRET: Joi.string().required().description("JWT Refresh Sceret"),
+  MONGO_URL: Joi.string()
+    .required()
+    .description("Mongo DB Url"),
+  JWT_ACCESS_SECRET: Joi.string()
+    .required()
+    .description("JWT Access Sceret"),
+  JWT_REFRESH_SECRET: Joi.string()
+    .required()
+    .description("JWT Refresh Sceret")
 });
 
 const { value: envVars, error } = envVarSchema
@@ -24,6 +32,9 @@ module.exports = {
     accessExpirationMinutes: 2,
     refreshExpirationDays: 30,
     accessSecret: envVars.JWT_ACCESS_SECRET,
-    refereshSecret: envVars.JWT_REFRESH_SECRET,
+    refereshSecret: envVars.JWT_REFRESH_SECRET
   },
+  bcrypt: {
+    saltRounds: 10
+  }
 };
