@@ -106,10 +106,15 @@ const generateRefreshToken = async (user, refreshToken) => {
   };
 };
 
+const deleteAllUserTokens = async userId => {
+  await Token.deleteMany({ userId: userId });
+};
+
 module.exports = {
   generateAuthTokens,
   saveToken,
   generateToken,
   verifyToken,
-  generateRefreshToken
+  generateRefreshToken,
+  deleteAllUserTokens
 };

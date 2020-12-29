@@ -3,6 +3,11 @@ const STATUS_401 = {
   error: "Unauthorized Access"
 };
 
+const STATUS_200 = {
+  status: 200,
+  message: "OK"
+};
+
 const STATUS_409 = {
   status: 409,
   error: "There is some conflict"
@@ -22,5 +27,6 @@ module.exports = {
   STATUS_401,
   STATUS_409,
   STATUS_500,
-  STATUS_404
+  STATUS_404,
+  STATUS_200
 };

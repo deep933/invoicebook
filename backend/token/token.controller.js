@@ -1,6 +1,5 @@
-const tokenService = require("../token/token.service");
-const catchAsync = require("../util/catchAsync");
-const httperrors = require("../util/httperrors");
+const tokenService = require("./token.service");
+const {catchAsync,httpErrors} = require("../util");
 
 const refreshToken = catchAsync(async (req, res) => {
   if (req.cookies["auth"] && req.cookies["auth"].refresh.token) {
@@ -9,8 +8,8 @@ const refreshToken = catchAsync(async (req, res) => {
       "REFRESH",
       err => {
         res
-          .status(httperrors.STATUS_401.status)
-          .send({ ...httperrors.STATUS_401, message: err });
+          .status(httpErrors.STATUS_401.status)
+          .send({ ...httpErrors.STATUS_401, message: err });
       }
     );
 
@@ -27,12 +26,12 @@ const refreshToken = catchAsync(async (req, res) => {
       res.end();
     } else {
       res
-        .status(httperrors.STATUS_401.status)
-        .send({ ...httperrors.STATUS_401, message: "Invalid/Expired Token" });
+        .status(httpErrors.STATUS_401.status)
+        .send({ ...httpErrors.STATUS_401, message: "Invalid/Expired Token" });
       res.end();
     }
   } else {
-    res.status(httperrors.STATUS_401.status).send(httperrors.STATUS_401);
+    res.status(httpErrors.STATUS_401.status).send(httpErrors.STATUS_401);
     res.end();
   }
 });

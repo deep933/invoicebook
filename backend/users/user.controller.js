@@ -1,16 +1,15 @@
 const userServices = require("./user.service");
-const catchAsync = require("../util/catchAsync");
-const httpError = require("../util/httperrors");
-const filter = require("../util/filter");
+const {catchAsync,httpErrors,filter} = require("../util");
+
 
 const getUser = catchAsync(async (req, res, next) => {
   const authTokens = req.cookies["auth"]; // recieve the auth tokens from cookies
   //verify the token & get the user Id
   //else throw Error 401
-  if (authTokens.access.token) {
+  if (authTokens && authTokens.access && authTokens.access.token) {
     const user = await userServices.getUser(authTokens, (status, err) => {
       // Something wrong with token or user
-      if (status === httpError.STATUS_401.status) {
+      if (status === httpErrors.STATUS_401.status) {
         res.redirect("/auth/refresh");
         res.end();
       } else {
@@ -24,7 +23,7 @@ const getUser = catchAsync(async (req, res, next) => {
     }
   } else {
     // Token not attched in cookie 404 Unauthorized
-    res.status(httpError.STATUS_401.status).send(httpError.STATUS_401);
+    res.status(httpErrors.STATUS_401.status).send(httpError.STATUS_401);
     res.end();
   }
 });
