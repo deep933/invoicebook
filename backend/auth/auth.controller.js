@@ -1,18 +1,17 @@
 const authServices = require("./auth.service");
-const {catchAsync,httpErrors} = require("../util");
-
+const { catchAsync, errorHandler } = require("../util");
+const tokenService = require("../token/token.service");
 
 const signup = catchAsync(async (req, res) => {
-  const token = await authServices.signupNewUser(req.body, (status, err) => {
-    res.status(status).send(err);
-    res.end();
+  const token = await authServices.signupNewUser(req.body, async (err) => {
+    await errorHandler(res, err)
   });
   if (token) {
     res.cookie("auth", token, {
       maxAge: token.refresh.exp.getTime(),
-      httpOnly: true
+      httpOnly: true,
     });
-    res.status(200).send(token);
+    res.status(200).json(token);
     res.end();
   }
 });
@@ -21,45 +20,69 @@ const signin = catchAsync(async (req, res) => {
   const email = req.body.email;
   const pass = req.body.pass;
 
-  if(email && pass){
-      const token = await authServices.signInWithEmailPassword(email,pass,(status,err)=>{
-        res.status(status).send(err);
-        res.end();
-      })
-      if (token) {
-        res.cookie("auth", token, {
-          maxAge: token.refresh.exp.getTime(),
-          httpOnly: true
-        });
-        res.status(200).send(token);
-        res.end();
+  if (email && pass) {
+    const token = await authServices.signInWithEmailPassword(
+      email,
+      pass,
+      async (err) => {
+        await errorHandler(res, err)
       }
-
-  }
-  else{
-    res.status(httpErrors.STATUS_401.status).send({...httpErrors.STATUS_500,message:"Required Email & Password"})
-
+    );
+    if (token) {
+      res.cookie("auth", token, {
+        maxAge: token.refresh.exp.getTime(),
+        httpOnly: true,
+      });
+      res.status(200).json({ success: true })
+      res.end();
+    }
+  } else {
+    await errorHandler(res, { status: 401, message: "Required Email & Password" })
   }
 });
 
-const signout = catchAsync(async (req,res)=>{
-    if(req.cookies['auth'] && req.cookies['auth'].refresh && req.cookies['auth'].refresh.token){
-         const signout = await authServices.signout(req.cookies['auth'].refresh.token,(status,err)=>{
-             res.status(status).send(err)
-         })
-         res.cookie("auth",{
-            maxAge: 0
-          });
-         if(signout) res.status(httpErrors.STATUS_200.status).send('Logout Success')
-         else res.status(httpErrors.STATUS_401.status).send(httpErrors.STATUS_401)
+const signout = catchAsync(async (req, res) => {
+  if (req.userId) {
+    const signout = await authServices.signout(req.userId, async (err) => {
+      await errorHandler(res, err);
+    });
+
+    if (signout) {
+      res.cookie("auth", {
+        maxAge: 0,
+      });
+      res.status(201).json({ success: true }).end();
     }
-    else{
-        res.status(httpErrors.STATUS_404.status).send(httpErrors.STATUS_404)
-    }
-})
+  } else {
+    await errorHandler(res, { status: 404 });
+  }
+});
+
+const googleSignIn = catchAsync(async (req, res) => {
+  if (req.body.token) {
+    const payload = await tokenService.verifyGoogleAuthToken(
+      req.body.token,
+      async (err) => {
+        await errorHandler(res, err);
+      }
+    );
+    const token = await authServices.signInWithGoogle(payload, async (err) => {
+      await errorHandler(res, err);
+    });
+
+    res.cookie("auth", token, {
+      maxAge: token.refresh.exp.getTime(),
+      httpOnly: true,
+    });
+    res.status(201).json({ success: true }).end();
+  } else {
+    await errorHandler(res, { status: 401 });
+  }
+});
 
 module.exports = {
   signup,
   signin,
-  signout
+  signout,
+  googleSignIn,
 };

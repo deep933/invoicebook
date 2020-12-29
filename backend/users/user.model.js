@@ -5,8 +5,10 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      trim: true
+      trim: true,
+      required: () =>{
+        return this.authType === 'email'
+      }
     },
     email: {
       type: String,
@@ -26,7 +28,21 @@ const userSchema = mongoose.Schema(
     },
     pass: {
       type: String,
-      required: true
+      required: () =>{
+          return this.authType === 'email'
+      }
+    },
+    accStatus:{
+        type:String,
+        enum:['active','inactive','suspended'],
+        required:true,
+        default:'inactive',
+        lowercase:true
+    },
+    authType:{
+        type:String,
+        enum:['email','google'],
+        required:true
     }
   },
   {
@@ -54,8 +70,8 @@ userSchema.statics.isPasswordValid = async pass => {
     pointsForContainingNumber: 10,
     pointsForContainingSymbol: 10
   };
-  console.log(validator.isStrongPassword(pass, options));
-  if (pass.length >= 8) {
+  console.log(pass && validator.isStrongPassword(pass, options));
+  if (pass && pass.length >= 8) {
     return validator.isStrongPassword(pass, options) > 35 ? true : false;
   } else {
     return false;
