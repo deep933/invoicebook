@@ -5,3 +5,5 @@ yarn-error.log
 
 # Environment varibales
 .env*git 
+
+.DS_Store
