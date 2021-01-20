@@ -61,9 +61,7 @@ module.exports = {
   passwordCheckOptions: passwordCheckOptions,
   cookie: {
     defaultOptions: {
-      maxAge: 1000,
-      httpOnly: true,
-      sameSite: 'strict'
+      httpOnly: true
     }
   }
 }
