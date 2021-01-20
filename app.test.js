@@ -4,8 +4,8 @@ const chaiHttp = require('chai-http')
 const should = chai.should()
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const { app, mongoose } = require('./app')
-const agent = chai.request.agent(app)
 chai.use(chaiHttp)
+const agent = chai.request.agent(app)
 
 const mongod = new MongoMemoryServer()
 const connect = async () => {
